@@ -1,21 +1,30 @@
-import { initClient, ClientProvider } from "@swapcard/react-sdk/lib/client";
-import { ApplicationProvider } from "@swapcard/react-sdk/lib/application";
-import { EventProvider } from "@swapcard/react-sdk/lib/event";
-import { ExhibitorEventListView } from "@swapcard/react-sdk/lib/exhibitor/event-list-view";
+import { useEffect, useState } from "react";
+import { initClient, getClientState } from "@swapcard/react-sdk/lib/client";
+import { getApplication } from "@swapcard/react-sdk/lib/application";
+import { getEvent } from "@swapcard/react-sdk/lib/event";
+import Exhibitors from "./Exhibitors.tsx";
 
 export default function App() {
-    const client = initClient();
+  const [initialState, setInitialState] = useState(null);
 
-    console.log(import.meta.env.VITE_PUBLIC_EVENT_ID);
-    console.log(import.meta.env.VITE_PUBLIC_EXHIBITOR_VIEW_ID);
+  useEffect(() => {
+    async function getInitialState() {
+      const client = initClient();
 
-    return (
-        <ClientProvider client={client}>
-            <ApplicationProvider>
-                <EventProvider eventId={import.meta.env.VITE_PUBLIC_EVENT_ID}>
-                    <ExhibitorEventListView viewId={import.meta.env.VITE_PUBLIC_EXHIBITOR_VIEW_ID} />
-                </EventProvider>
-            </ApplicationProvider>
-        </ClientProvider>
-    );
+      await Promise.all([
+        getApplication(client),
+        getEvent(client, { eventId: import.meta.env.VITE_PUBLIC_EVENT_ID }),
+      ]);
+
+      const initialState = getClientState(client);
+      setInitialState(initialState);
+    }
+
+    void getInitialState();
+  }, []);
+
+  console.log(import.meta.env.VITE_PUBLIC_EVENT_ID);
+  console.log(import.meta.env.VITE_PUBLIC_EXHIBITOR_VIEW_ID);
+
+  return <>{initialState && <Exhibitors initialState={initialState} />}</>;
 }
