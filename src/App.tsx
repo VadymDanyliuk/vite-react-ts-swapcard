@@ -6,6 +6,8 @@ import { ExhibitorEventListView } from "@swapcard/react-sdk/lib/exhibitor/event-
 export default function App() {
     const client = initClient();
 
+    // See also https://github.com/VadymDanyliuk/vite-react-ts-swapcard/tree/dev
+
     console.log(import.meta.env.VITE_PUBLIC_EVENT_ID);
     console.log(import.meta.env.VITE_PUBLIC_EXHIBITOR_VIEW_ID);
 
